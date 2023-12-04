@@ -5,9 +5,20 @@ def main():
     lines = file.readlines()
     file.close()
 
+    point_command_separation_index = lines.index("\n")
+    point_lines = lines[0:point_command_separation_index]
+    command_lines = lines[point_command_separation_index+1:]
+    
+    paper = Paper(point_lines)
+
+    print(point_lines)
+    print(command_lines)
+
+    return
+
     isPoint = True
     commands: List(FoldCommand) = []
-    paper = Paper()
+    paper = Paper(lines)
 
     for line in lines:
         line = line.strip()
@@ -43,10 +54,25 @@ class FoldCommand:
         self.index = index
 
 class Paper:
-    def __init__(self):
+    def __init__(self, lines: List(str)):
         self.points : List(Point) = []
         self.max_x: int = 0
         self.max_y: int = 0
+        self.grid: List(List(bool))= []
+
+        for line in lines:
+            coordinates = line.strip().split(",")
+            point = Point(coordinates[0], coordinates[1])
+            self.points.append(point)
+
+        if(self.max_x < point.x): self.max_x = point.x
+        if(self.max_y < point.y): self.max_y = point.y
+
+        for y in self.max_y:
+            self.grid.append([])
+
+            for x in self.max_x:
+                self.grid[y].append()
 
     def add(self, point: Point):
         if self.hasPoint(point.x, point.y): return
