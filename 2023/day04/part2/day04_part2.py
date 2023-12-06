@@ -9,46 +9,71 @@ class Card:
         self.score = self.calculcate_winning_score()
 
     def calculcate_winning_score(self):
-        pass
+        score = 0
+        
+        for card_number in self.card_numbers:
+            if card_number in self.winning_numbers:
+                score += 1
 
-def create_card(line: str):
+        return score
+
+
+def create_card(line: str) -> Card:
     splitted_line = line.split("|")
 
-    first_part = splitted_line[0].split(":")[1]
+    splitted_first_part = splitted_line[0].split(":")
+    id = int(re.search(r'\d+', splitted_first_part[0]).group())
+
+    first_part = splitted_first_part[1]
     second_part = splitted_line[1]
 
-    winning_numbers = re.findall("\d+", first_part)
-    card_numbers = re.findall("\d+", second_part)
+    winning_numbers = re.findall(r'\d+', first_part)
+    card_numbers = re.findall(r'\d+', second_part)
 
-    return Card(winning_numbers, card_numbers)
+    return Card(id, winning_numbers, card_numbers)
+
+def create_sub_cards(original_cards: dict, card: Card) -> list[Card]:
+    if card.score == 0: return []
+    
+    #print(f'id:{card.id}; score:{card.score}')
+
+    new_cards = []
+    for i in range(card.id + 1, card.score + card.id + 1):
+        if i in original_cards:
+            original_card = original_cards[i]
+            new_cards.append(Card(i, original_card.winning_numbers, original_card.card_numbers))
+
+    return new_cards
 
 def main():
-    #file = open('day04_part1_example_input.txt', 'r')
-    file = open('day04_part1_real_input.txt', 'r')
+    #file = open('day04_part2_example_input.txt', 'r')
+    file = open('day04_part2_real_input.txt', 'r')
     lines = file.read().split('\n')
     file.close()
 
-    sum = 0
+    orignial_cards = dict()
 
     for line in lines:
         card = create_card(line)
+        orignial_cards[card.id] = card
 
-        got_winning_numbers_count = 0
-        card_points = 0
+    queue: list[Card] = [] + list(orignial_cards.values())
+    processed_cards: list[Card] = []
+    len
 
-        for card_number in card_numbers:
-            if card_number in winning_numbers:
-                got_winning_numbers_count += 1
+    while len(queue) > 0:
+        card = queue.pop()
+        sub_cards = create_sub_cards(orignial_cards, card)
+        
+        for sub_card in sub_cards:
+            queue.append(sub_card)
 
-                if got_winning_numbers_count == 1:
-                    card_points = 1
-                else: 
-                    card_points = card_points * 2
+        processed_cards.append(card)
 
-        print(f'{winning_numbers}; {card_numbers} --> {got_winning_numbers_count} --> {card_points}')
-        sum += card_points
+        if (len(processed_cards) % 10000) == 0:
+            print(f'queue:{len(queue)}; processed:{len(processed_cards)}')
 
-    print(sum)
+    print(f'queue:{len(queue)}; processed:{len(processed_cards)}')
 
 if __name__ == "__main__":
     main()
