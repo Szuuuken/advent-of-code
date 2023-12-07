@@ -1,6 +1,8 @@
 import sys
 from typing import List
 import re
+from timeit import default_timer as timer
+from datetime import timedelta
 
 class GardenMapEntry:
     def __init__(self, destination_start: int, source_start: int, range_length) -> None:
@@ -67,8 +69,8 @@ def get_seeds(line: str) -> list[int]:
     return seeds
 
 def main():
-    #file = open('day05_part1_example_input.txt', 'r')
-    file = open('day05_part1_real_input.txt', 'r')
+    #file = open('day05_part2_example_input.txt', 'r')
+    file = open('day05_part2_real_input.txt', 'r')
     lines = file.read().split('\n')
     file.close()
 
@@ -111,9 +113,43 @@ def main():
 
     min_location = sys.maxsize
 
-    for seed in seeds:
-        location = seed_to_soil_map.resolve_next(seed)
-        if location < min_location: min_location = location
+    iterations = 0
+
+    for i in range(0, len(seeds), 2):
+        seed_start = seeds[i]
+        seed_length = seed_start + seeds[i + 1]
+        iterations += len(range(seed_start, seed_length))
+
+    count = 0
+    needed_iterations = len(seeds)/2
+    iteration = 0
+    start = timer()
+
+    for i in range(0, len(seeds), 2):
+        seed_start = seeds[i]
+        seed_length = seed_start + seeds[i + 1]
+        #print(f'{seed_start}-{seed_length}')
+
+        seed_count = 0
+        for seed in range(seed_start, seed_length):
+            #print(f'{seed}')
+            location = seed_to_soil_map.resolve_next(seed)
+            if location < min_location: min_location = location
+
+            seed_count += 1
+            iteration += 1
+
+            #if iteration % 100000 == 0: print(f'{count}/{needed_iterations} --> seed_count: {iteration}/{iterations}')
+            if iteration % 500000 == 0:
+                current_end = timer()
+                t = timedelta(seconds=current_end-start)
+                needed_secods = timedelta(seconds=t.seconds / iteration * (iterations - iteration))
+                percent = round(iteration / iterations * 100, 2)
+                print(f'{count}/{needed_iterations} --> seed_count: {iteration}/{iterations}; {t}/{needed_secods} --> {percent}%')
+
+        count += 1
+        #end = timer()
+        #print(f'#### {count}/{needed_iterations} finished in {timedelta(seconds=end-start)}#####')
         
     print(min_location)
 
