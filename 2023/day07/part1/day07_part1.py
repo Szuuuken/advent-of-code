@@ -131,7 +131,8 @@ def compare(items: list[Hand]):
 
 def main():
     #file = open('day07_part1_example_input.txt', 'r')
-    file = open('day07_part1_real_input.txt', 'r')
+    file = open('day07_part1_custom_input.txt', 'r') # https://www.reddit.com/r/adventofcode/comments/18cr4xr/2023_day_7_better_example_input_not_a_spoiler/
+    #file = open('day07_part1_real_input.txt', 'r')
     lines = file.read().split('\n')
     file.close()
 
