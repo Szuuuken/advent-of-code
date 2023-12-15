@@ -1,11 +1,9 @@
-import sys
 from typing import List
 import re
 from functools import cmp_to_key
 
 class Hand:
     def __init__(self, line: str, calculate_joker_variations: bool) -> None:
-        #print(f'___{line}')
         splitted_line = line.split(" ")
         self.cards = splitted_line[0]
         self.bid = int(splitted_line[1])
@@ -20,8 +18,8 @@ class Hand:
         return True
 
     def check(self):
-
         char_count_list = dict()
+        
         for c in self.cards:
             if c not in char_count_list:
                 char_count_list[c] = 1
@@ -31,16 +29,8 @@ class Hand:
 
         char_count_counts = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
 
-        # print(char_count_counts)
-        # print(char_counts)
         for char_count in char_counts:
-            # print(char_count)
             char_count_counts[char_count] += 1
-
-        # print("############")
-        # print(self.cards)
-
-        # print (char_count_counts)
 
         self.is_five_of_a_kind = char_count_counts[5] == 1
         self.is_four_of_a_kind = char_count_counts[4] == 1 and char_count_counts[1] == 1
@@ -49,16 +39,6 @@ class Hand:
         self.two_pair = char_count_counts[2] == 2 and char_count_counts[1] == 1
         self.one_pair = char_count_counts[2] == 1 and char_count_counts[1] == 3
         self.high_card = char_count_counts[1] == 5
-
-        # print(f'is_five_of_a_kind: {self.is_five_of_a_kind}')
-        # print(f'is_four_of_a_kind: {self.is_four_of_a_kind}')
-        # print(f'full_house: {self.full_house}')
-        # print(f'is_three_of_a_kind: {self.is_three_of_a_kind}')
-        # print(f'two_pair: {self.two_pair}')
-        # print(f'one_pair: {self.one_pair}')
-        # print(f'high_card: {self.high_card}')
-
-        # print("###############")
 
     def kind_score(self):
         if(self.is_five_of_a_kind): return 7
@@ -96,44 +76,43 @@ class Hand:
         return score
     
     def get_joker_variation_for_index(self, current_line: str, index: int) -> list[str]:
-        #print(current_line[index])
         if current_line[index] != 'J':
             return []
         
         card_names = ['A', 'K', 'Q', 'T', '9', '8', '7', '6', '5', '4', '3', '2', 'J']
         return [f'{current_line[:index]}{card_name}{current_line[index+1:]}' for card_name in card_names]
 
-
     def get_joker_variations(self):
-        variations: list[str] = self.get_joker_variation_for_index(self.cards, 0)
-        if len(variations) == 0: variations.append(self.cards)
-        
-        for index in range(1, 5):
-            #print(index)
+        search_res = re.finditer(r'J', self.cards)
+        if search_res == None: return []
+        indexes = [x.start() for x in search_res]
 
-            new_variations: [str] = []
-            for variation in variations:
-                #print(variation)
-                new_variations += self.get_joker_variation_for_index(variation, index)
+        card_names = ['A', 'K', 'Q', 'T', '9', '8', '7', '6', '5', '4', '3', '2', 'J']
+        variations: list[str] = []
+        max_hand = None
 
-            variations += new_variations
+        for card_name in card_names:
+            variation = self.cards
 
-                #print(variations)
-            
+            for index in indexes:
+                variation = f'{variation[:index]}{card_name}{variation[index + 1:]}'
 
-        #print(f'variations: {variations}')
-        return [Hand(str(variation_line) + " 0", False).fitness_score for variation_line in variations]
+            variation_hand = Hand(variation + " 0", False)
+            variations.append(variation_hand.fitness_score)
 
+            if max_hand == None or variation_hand.fitness_score > max_hand.fitness_score:
+                max_hand = variation_hand
+
+        return max_hand
+    
     def fitness(self, calculate_joker_variations: bool):
 
         max_fitness = 0
+        card_score = self.card_score()
 
         if calculate_joker_variations:
-            variations = self.get_joker_variations() if calculate_joker_variations else []
-            max_fitness = max(variations) if len(variations) > 0 else 0
-            print(max_fitness)
+            max_fitness = (self.get_joker_variations().fitness_score & 0x111111111111111_00000) + card_score
         
-            
         score = 0x0
 
         if(self.is_five_of_a_kind): score = 0x10000000000000000000
@@ -144,7 +123,6 @@ class Hand:
         if(self.one_pair): score = 0x00000100000000000000
         if(self.high_card): score = 0x00000010000000000000
 
-        card_score = self.card_score()
         score += card_score
 
         if max_fitness > score:
@@ -156,13 +134,11 @@ class Hand:
 
 def main():
     #file = open('day07_part2_example_input.txt', 'r')
-    file = open('day07_part2_custom_input.txt', 'r') # https://www.reddit.com/r/adventofcode/comments/18cr4xr/2023_day_7_better_example_input_not_a_spoiler/
-    #file = open('day07_part2_real_input.txt', 'r')
+    #file = open('day07_part2_custom_input.txt', 'r') # https://www.reddit.com/r/adventofcode/comments/18cr4xr/2023_day_7_better_example_input_not_a_spoiler/
+    file = open('day07_part2_real_input.txt', 'r')
     lines = file.read().split('\n')
     file.close()
-
-    print("                  54F32OHAKQJT98765432")
-
+    
     hands = [Hand(line, True) for line in lines]
     sorted_hands = sorted(hands, key=cmp_to_key(lambda item1, item2: item1.fitness_score - item2.fitness_score))
 
@@ -174,11 +150,8 @@ def main():
         winnings = rank * hand.bid
         sum += winnings
 
-        #print(f'card_score: {card_score:020b} --> hand:{self.cards}')
         print(f'hand: {hand.cards} score:{hand.fitness_score:020x} rank: {rank} bid: {hand.bid} winnings: {winnings}')
         
-        
-
     print(sum)
     
 if __name__ == "__main__":
