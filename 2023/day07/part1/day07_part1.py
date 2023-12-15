@@ -29,16 +29,8 @@ class Hand:
 
         char_count_counts = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
 
-        # print(char_count_counts)
-        # print(char_counts)
         for char_count in char_counts:
-            # print(char_count)
             char_count_counts[char_count] += 1
-
-        # print("############")
-        # print(self.cards)
-
-        # print (char_count_counts)
 
         self.is_five_of_a_kind = char_count_counts[5] == 1
         self.is_four_of_a_kind = char_count_counts[4] == 1 and char_count_counts[1] == 1
@@ -47,16 +39,6 @@ class Hand:
         self.two_pair = char_count_counts[2] == 2 and char_count_counts[1] == 1
         self.one_pair = char_count_counts[2] == 1 and char_count_counts[1] == 3
         self.high_card = char_count_counts[1] == 5
-
-        # print(f'is_five_of_a_kind: {self.is_five_of_a_kind}')
-        # print(f'is_four_of_a_kind: {self.is_four_of_a_kind}')
-        # print(f'full_house: {self.full_house}')
-        # print(f'is_three_of_a_kind: {self.is_three_of_a_kind}')
-        # print(f'two_pair: {self.two_pair}')
-        # print(f'one_pair: {self.one_pair}')
-        # print(f'high_card: {self.high_card}')
-
-        # print("###############")
 
     def kind_score(self):
         if(self.is_five_of_a_kind): return 7
@@ -69,27 +51,27 @@ class Hand:
 
         return None
     
-    def card_score(self):
-        scores = {'A': 0x00000001000000000000,
-                  'K': 0x00000000100000000000, 
-                  'Q': 0x00000000010000000000, 
-                  'J': 0x00000000001000000000, 
-                  'T': 0x00000000000100000000, 
-                  '9': 0x00000000000010000000, 
-                  '8': 0x00000000000001000000, 
-                  '7': 0x00000000000000100000, 
-                  '6': 0x00000000000000010000, 
-                  '5': 0x00000000000000001000, 
-                  '4': 0x00000000000000000100, 
-                  '3': 0x00000000000000000010, 
-                  '2': 0x00000000000000000001}
+    def card_score(self): 
 
-        score = 0x0
-
+        scores = {'A': 'D',
+                  'K': 'C', 
+                  'Q': 'B', 
+                  'J': 'A', 
+                  'T': '9', 
+                  '9': '8', 
+                  '8': '7', 
+                  '7': '6', 
+                  '6': '5', 
+                  '5': '4', 
+                  '4': '3', 
+                  '3': '2', 
+                  '2': '1'}
+        
+        score_string = ""
         for card in self.cards:
-            #print(f'{score}; {scores[card]}')
-            score += scores[card]
+            score_string += scores[card]
 
+        score = int(score_string, 16)
         return score
 
     def fitness(self):
@@ -131,12 +113,10 @@ def compare(items: list[Hand]):
 
 def main():
     #file = open('day07_part1_example_input.txt', 'r')
-    file = open('day07_part1_custom_input.txt', 'r') # https://www.reddit.com/r/adventofcode/comments/18cr4xr/2023_day_7_better_example_input_not_a_spoiler/
-    #file = open('day07_part1_real_input.txt', 'r')
+    #file = open('day07_part1_custom_input.txt', 'r') # https://www.reddit.com/r/adventofcode/comments/18cr4xr/2023_day_7_better_example_input_not_a_spoiler/
+    file = open('day07_part1_real_input.txt', 'r')
     lines = file.read().split('\n')
     file.close()
-
-    print("                  54F32OHAKQJT98765432")
 
     hands = [Hand(line) for line in lines]
     sorted_hands = sorted(hands, key=cmp_to_key(lambda item1, item2: item1.fitness() - item2.fitness()))
