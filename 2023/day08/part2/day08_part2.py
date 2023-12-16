@@ -20,8 +20,6 @@ def main():
         if node_codes[0][2] == 'A':
             current_nodes.append(nodes[node_codes[0]])
 
-    #print(instructions)
-    #print(nodes)
     searching = True
     instruction_pointer = 0
     steps = 0
@@ -37,11 +35,10 @@ def main():
             next_node = current_node[next_index]
             next_nodes.append(nodes[next_node])
 
-            if next_node[2] != "Z":
+            if next_node[2] != 'Z':
                 all_end_with_z = False
 
-        if all_end_with_z:
-            searching = False
+        searching = not all_end_with_z
 
         #print(next_nodes)
         current_nodes = next_nodes
