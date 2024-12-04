@@ -53,3 +53,6 @@ def main():
     
 if __name__ == "__main__":
     main()
+
+
+    #https://www.reddit.com/r/adventofcode/comments/18dwgu0/2023_day_08_part_2_surely_it_wont_take_longer/
