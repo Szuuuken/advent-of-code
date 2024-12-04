@@ -25,15 +25,17 @@ for y in range(0, len(input)):
     line_len = len(line)
 
     for x in range(0, line_len):
-        print("------")
-        print((x,y), y+3, input_len, y+3 >= input_len)
+        #print("------")
+        #print((x,y), y < 2, x+3, x+3 >= line_len)
 
         left_word = None if x < 3 else input[y][x-3:x+1]
         right_word = None if x + 3 > line_len else input[y][x:x+4] # [0,1,2,3,4,5,6,7,8,9] --> len == 10
         top_word = None if y < 3 else ''.join([l[x] for l in input[y-3:y+1]])
         bottom_word = None if y + 3 >= input_len else ''.join([l[x] for l in input[y:y+4]])
         left_bottom_word = None if y > 2 and x > 2 else input[y-3][x-3] + input[y-2][x-2] + input[y-1][x-1] + input[y][x]
-        left_top_word = None if y + 3 >= input_len and x > 2 else input[y+3][x-3] + input[y+2][x-2] + input[y+1][x-1] + input[y][x]
+        left_top_word = None if y + 3 >= input_len or x > 2 else input[y+3][x-3] + input[y+2][x-2] + input[y+1][x-1] + input[y][x]
+        right_top_word = None if y > 2 or x + 3 >= line_len else input[y-3][x+3] + input[y-2][x+2] + input[y-1][x+1] + input[y][x]
+        right_bottom_word = None if y + 3 >= input_len or x + 3 >= line_len else input[y+3][x+3] + input[y+2][x+2] + input[y+1][x+1] + input[y][x]
 
         # print(input_len)
         #print(input[y])
@@ -41,14 +43,17 @@ for y in range(0, len(input)):
         # print(input[y+2])
         # print(input[y+3])
 
-
-
         #print(left_word)
         #print(right_word)
         #print(top_word)
         #print(bottom_word)
-        print(left_bottom_word)
+        #print(left_bottom_word)
+        #print(right_top_word)
+        #print(right_bottom_word)
         #print("-------")
+
+        words = [left_word, right_word, top_word, bottom_word, left_bottom_word, left_top_word, right_top_word, right_bottom_word]
+        print(words)
 
 
 
