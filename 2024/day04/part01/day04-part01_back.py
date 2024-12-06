@@ -1,4 +1,5 @@
 import re
+import numpy as np
 
 def pp(matrix: []):
     for line in matrix:
@@ -15,14 +16,67 @@ with open(input_file_name) as file:
         if len(line) > 0:
             input.append(line)
             input2.append(list(line))
-pp(input)
-print("####")
+#pp(input)
+#print("####")
 
 input_len = len(input)
 result = ['.'*len(input[0])]*len(input)
-pp(result)
+#pp(result)
+
+
+diags = []
+
+
+t_input = [
+        ["abc"],
+        ["def"],
+        ["ghi"]
+        ]
+def get_diagonals(matrix):
+    diagonals = []
+
+    ndim = matrix.shape[0]
+    for i in range(-ndim + 1, ndim):
+        diagonal = np.diag(matrix, i)
+        diagonal_list = diagonal.tolist()
+
+        for diagonal_sub_list in diagonal_list:
+            for diagonal_item in diagonal_sub_list:
+                if len(diagonal_item) > 0:
+                    diagonals.append(diagonal_item)
+    return diagonals
+
+#input_x = [list(e) for e in input]
+input_matrix = np.array(t_input)
+a = get_diagonals(input_matrix)
+#b = get_diagonals(input_matrix.transpose())
+
+print(a)
+
+exit()
+
+# diags = [np.diag(matrix, i).tolist() 
+
+matrix = np.array(input)
+ndim = matrix.shape[0]
+for i in range(-ndim + 1, ndim):
+    d = np.diag(matrix, i).tolist()
+    d = sum(d,[])
+    b = []
+    for e in d:
+        #print(e)
+        if len(e)>0:
+            b.append(e)
+
+    print(b)
+    exit()
+
+#diags = [np.diag(matrix, i).tolist() for i in range(-ndim + 1, ndim)][::-1]
+#print(diags)
 
 count = 0
+
+exit()
 
 for y in range(0, len(input)):
     line = input[y]
@@ -62,7 +116,7 @@ for y in range(0, len(input)):
 
         words = [left_word, right_word, top_word, bottom_word, left_bottom_word, left_top_word, right_top_word, right_bottom_word]
         for word in words:
-            if word != None and (word == "XMAS" or word[-\\vitadevteam4\Logs\Vita\Stamm\Pflegegeld\Share\Upload\Outbox1] == "XMAS"):
+            if word != None and (word == "XMAS" or word[::-1] == "XMAS"):
                 count += 1
 
         #print(words)
